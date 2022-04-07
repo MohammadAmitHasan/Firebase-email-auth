@@ -12,6 +12,7 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
+  const [error, setError] = useState('');
 
   const emailHandler = (event) => {
     setEmail(event.target.value);
@@ -25,13 +26,19 @@ function App() {
 
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
     }
 
     setValidated(true);
 
     event.preventDefault();
+    if (!/(?=.*[!@#$%^&*])/.test(password)) {
+      setError('Password must have a special character');
+      return
+    }
+
+    setError('');
+
     createUserWithEmailAndPassword(auth, email, password)
       .then(result => console.log(result.user))
       .catch(error => console.error(error))
@@ -67,6 +74,7 @@ function App() {
           <Button variant="primary" type="submit">
             Submit
           </Button>
+          <p>{error}</p>
         </Form>
       </div>
     </div>
