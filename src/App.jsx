@@ -1,5 +1,5 @@
 import './App.css'
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import app from './config.init'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form'
@@ -13,6 +13,7 @@ function App() {
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
   const [error, setError] = useState('');
+  const [registered, setRegistered] = useState(false);
 
   const emailHandler = (event) => {
     setEmail(event.target.value);
@@ -20,6 +21,10 @@ function App() {
 
   const passwordHandler = (event) => {
     setPassword(event.target.value);
+  }
+
+  const registerToggle = event => {
+    setRegistered(event.target.checked);
   }
 
   const submitHandler = (event) => {
@@ -41,18 +46,31 @@ function App() {
 
     setError('');
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(result => console.log(result.user))
-      .catch(error => {
-        console.error(error)
-        setError(error.message);
-      })
+
+    if (registered) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(result => console.log(result.user))
+        .catch(error => {
+          console.error(error)
+          setError(error.message)
+        })
+    }
+    else {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(result => console.log(result.user))
+        .catch(error => {
+          console.error(error)
+          setError(error.message);
+        })
+    }
+
   }
 
   return (
     <div>
       <div className='w-50 mx-auto border border-2 p-3 rounded-3 mt-4'>
-        <h2 className='text-center'>Register</h2>
+
+        <h2 className='text-center'>{registered ? 'Login' : 'Register'}</h2>
 
         <Form noValidate validated={validated} onSubmit={submitHandler}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -73,9 +91,11 @@ function App() {
               Please choose a password   .
             </Form.Control.Feedback>
           </Form.Group>
+
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
-            <Form.Check type="checkbox" label="Check me out" />
+            <Form.Check onChange={registerToggle} type="checkbox" label="Already Registered" />
           </Form.Group>
+
           <Button variant="primary" type="submit">
             Submit
           </Button>
