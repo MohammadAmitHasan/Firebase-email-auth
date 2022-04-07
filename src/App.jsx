@@ -32,8 +32,10 @@ function App() {
     setValidated(true);
 
     event.preventDefault();
+
     if (!/(?=.*[!@#$%^&*])/.test(password)) {
       setError('Password must have a special character');
+      console.log(password)
       return
     }
 
@@ -41,7 +43,10 @@ function App() {
 
     createUserWithEmailAndPassword(auth, email, password)
       .then(result => console.log(result.user))
-      .catch(error => console.error(error))
+      .catch(error => {
+        console.error(error)
+        setError(error.message);
+      })
   }
 
   return (
@@ -74,7 +79,7 @@ function App() {
           <Button variant="primary" type="submit">
             Submit
           </Button>
-          <p>{error}</p>
+          <p className='text-danger mt-4'>{error.slice(22)}</p>
         </Form>
       </div>
     </div>
